@@ -1,0 +1,17 @@
+{
+	"name": "DS_AzureSQL_Control",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_AzureSQL",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "pipeline_control"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

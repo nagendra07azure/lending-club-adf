@@ -1,0 +1,15 @@
+{
+	"name": "ADF-lending-club-dev",
+	"properties": {
+		"trustModeClaimForMi": {
+			"value": "Disabled",
+			"editable": true
+		}
+	},
+	"location": "centralindia",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "d722942c-bfc5-4321-928f-9aa6b8f65310",
+		"tenantId": "55a6298d-c995-41ec-85f9-23f3ff413892"
+	}
+}

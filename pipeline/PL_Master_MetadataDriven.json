@@ -1,0 +1,141 @@
+{
+	"name": "PL_Master_MetadataDriven",
+	"properties": {
+		"activities": [
+			{
+				"name": "Lookup_PipelineConfig",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "SELECT\n    pipeline_id,\n    source_name,\n    source_schema,\n    source_table,\n    watermark_column,\n    watermark_datatype,\n    target_container,\n    target_folder,\n    target_format,\n    load_type,\n    batch_size\nFROM dbo.pipeline_control\nWHERE is_active = 1;",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DS_AzureSQL_Control",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "ForEach_Source",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Lookup_PipelineConfig",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Lookup_PipelineConfig').output.value",
+						"type": "Expression"
+					},
+					"batchCount": 4,
+					"activities": [
+						{
+							"name": "Switch_LoadType",
+							"type": "Switch",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"on": {
+									"value": "@item().load_type",
+									"type": "Expression"
+								},
+								"cases": [
+									{
+										"value": "INCREMENTAL",
+										"activities": [
+											{
+												"name": "Execute_Incremental",
+												"type": "ExecutePipeline",
+												"dependsOn": [],
+												"policy": {
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"pipeline": {
+														"referenceName": "PL_Child_IncrementalLoad",
+														"type": "PipelineReference"
+													},
+													"waitOnCompletion": true,
+													"parameters": {
+														"source_name": {
+															"value": "@item().source_name",
+															"type": "Expression"
+														},
+														"source_schema": {
+															"value": "@item().source_schema",
+															"type": "Expression"
+														},
+														"source_table": {
+															"value": "@item().source_table",
+															"type": "Expression"
+														},
+														"watermark_column": {
+															"value": "@item().watermark_column",
+															"type": "Expression"
+														},
+														"watermark_datatype": {
+															"value": "@item().watermark_datatype",
+															"type": "Expression"
+														},
+														"target_container": {
+															"value": "@item().target_container",
+															"type": "Expression"
+														},
+														"target_folder": {
+															"value": "@item().target_folder",
+															"type": "Expression"
+														},
+														"target_format": {
+															"value": "@item().target_format",
+															"type": "Expression"
+														}
+													}
+												}
+											}
+										]
+									},
+									{
+										"value": "SCD2",
+										"activities": [
+											{
+												"name": "SCD2_NotImplemented",
+												"type": "Wait",
+												"dependsOn": [],
+												"userProperties": [],
+												"typeProperties": {
+													"waitTimeInSeconds": 1
+												}
+											}
+										]
+									}
+								]
+							}
+						}
+					]
+				}
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2026-06-20T05:41:42Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}
