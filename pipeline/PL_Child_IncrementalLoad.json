@@ -260,6 +260,27 @@
 					"referenceName": "LS_AzureSQL",
 					"type": "LinkedServiceReference"
 				}
+			},
+			{
+				"name": "Set variable1",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "SP_LogRunSuccess",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "ac",
+					"value": "123"
+				}
 			}
 		],
 		"parameters": {
@@ -293,6 +314,9 @@
 				"type": "String"
 			},
 			"new_watermar": {
+				"type": "String"
+			},
+			"ac": {
 				"type": "String"
 			}
 		},
